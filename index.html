@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>札幌スープカレー市場の構造的分析</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Noto+Sans+JP:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-deep: #0C0A08;
+  --bg-warm: #1A1410;
+  --bg-card: #231D16;
+  --bg-card-hover: #2C241B;
+  --accent-spice: #D4832F;
+  --accent-gold: #C9A96E;
+  --accent-red: #B8432F;
+  --accent-green: #6B8C5A;
+  --text-main: #E8E0D6;
+  --text-muted: #9A8E82;
+  --text-dim: #6B6058;
+  --border: rgba(201, 169, 110, 0.12);
+  --border-accent: rgba(212, 131, 47, 0.3);
+}
+
+- { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+scroll-behavior: smooth;
+scrollbar-width: thin;
+scrollbar-color: var(–accent-gold) var(–bg-deep);
+}
+
+body {
+font-family: ‘Noto Sans JP’, sans-serif;
+background: var(–bg-deep);
+color: var(–text-main);
+line-height: 1.9;
+font-weight: 300;
+overflow-x: hidden;
+}
+
+/* ── Grain Overlay ── */
+body::before {
+content: ‘’;
+position: fixed;
+inset: 0;
+background-image: url(“data:image/svg+xml,%3Csvg viewBox=‘0 0 256 256’ xmlns=‘http://www.w3.org/2000/svg’%3E%3Cfilter id=‘noise’%3E%3CfeTurbulence type=‘fractalNoise’ baseFrequency=‘0.9’ numOctaves=‘4’ stitchTiles=‘stitch’/%3E%3C/filter%3E%3Crect width=‘100%25’ height=‘100%25’ filter=‘url(%23noise)’ opacity=‘0.03’/%3E%3C/svg%3E”);
+pointer-events: none;
+z-index: 9999;
+}
+
+/* ── Hero ── */
+.hero {
+min-height: 100vh;
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+position: relative;
+padding: 2rem;
+text-align: center;
+overflow: hidden;
+}
+
+.hero::before {
+content: ‘’;
+position: absolute;
+inset: 0;
+background:
+radial-gradient(ellipse 80% 60% at 50% 40%, rgba(212,131,47,0.08) 0%, transparent 70%),
+radial-gradient(ellipse 50% 50% at 20% 80%, rgba(184,67,47,0.05) 0%, transparent 60%),
+radial-gradient(ellipse 40% 40% at 80% 20%, rgba(201,169,110,0.04) 0%, transparent 60%);
+z-index: 0;
+}
+
+.hero-label {
+font-size: 0.7rem;
+letter-spacing: 0.4em;
+text-transform: uppercase;
+color: var(–accent-gold);
+margin-bottom: 2rem;
+position: relative;
+z-index: 1;
+opacity: 0;
+animation: fadeUp 1s 0.3s ease forwards;
+}
+
+.hero-label::before,
+.hero-label::after {
+content: ‘───’;
+margin: 0 1rem;
+color: var(–text-dim);
+}
+
+.hero h1 {
+font-family: ‘Noto Serif JP’, serif;
+font-weight: 900;
+font-size: clamp(2rem, 5vw, 4rem);
+line-height: 1.3;
+max-width: 900px;
+position: relative;
+z-index: 1;
+opacity: 0;
+animation: fadeUp 1s 0.6s ease forwards;
+}
+
+.hero h1 .accent { color: var(–accent-spice); }
+
+.hero-sub {
+font-size: 1rem;
+color: var(–text-muted);
+margin-top: 1.5rem;
+max-width: 650px;
+position: relative;
+z-index: 1;
+opacity: 0;
+animation: fadeUp 1s 0.9s ease forwards;
+}
+
+.hero-shops {
+display: flex;
+gap: 1.5rem;
+margin-top: 3rem;
+flex-wrap: wrap;
+justify-content: center;
+position: relative;
+z-index: 1;
+}
+
+.hero-shops span {
+font-size: 0.75rem;
+letter-spacing: 0.15em;
+padding: 0.5rem 1.2rem;
+border: 1px solid var(–border);
+border-radius: 100px;
+color: var(–text-muted);
+opacity: 0;
+animation: fadeUp 0.8s ease forwards;
+transition: all 0.3s ease;
+}
+.hero-shops span:nth-child(1) { animation-delay: 1.2s; }
+.hero-shops span:nth-child(2) { animation-delay: 1.35s; }
+.hero-shops span:nth-child(3) { animation-delay: 1.5s; }
+.hero-shops span:nth-child(4) { animation-delay: 1.65s; }
+.hero-shops span:hover {
+border-color: var(–accent-spice);
+color: var(–accent-spice);
+background: rgba(212,131,47,0.06);
+}
+
+.scroll-hint {
+position: absolute;
+bottom: 2.5rem;
+left: 50%;
+transform: translateX(-50%);
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 0.5rem;
+color: var(–text-dim);
+font-size: 0.65rem;
+letter-spacing: 0.3em;
+opacity: 0;
+animation: fadeUp 1s 2s ease forwards;
+}
+
+.scroll-line {
+width: 1px;
+height: 40px;
+background: linear-gradient(to bottom, var(–accent-gold), transparent);
+animation: scrollPulse 2s ease-in-out infinite;
+}
+
+/* ── Navigation ── */
+.nav-bar {
+position: sticky;
+top: 0;
+z-index: 100;
+background: rgba(12,10,8,0.85);
+backdrop-filter: blur(20px);
+-webkit-backdrop-filter: blur(20px);
+border-bottom: 1px solid var(–border);
+padding: 0 2rem;
+display: none;
+}
+
+.nav-bar.visible { display: block; }
+
+.nav-inner {
+max-width: 1200px;
+margin: 0 auto;
+display: flex;
+align-items: center;
+gap: 2rem;
+overflow-x: auto;
+scrollbar-width: none;
+padding: 0.8rem 0;
+}
+.nav-inner::-webkit-scrollbar { display: none; }
+
+.nav-bar a {
+font-size: 0.72rem;
+letter-spacing: 0.12em;
+color: var(–text-muted);
+text-decoration: none;
+white-space: nowrap;
+transition: color 0.3s;
+padding: 0.3rem 0;
+border-bottom: 1px solid transparent;
+}
+.nav-bar a:hover, .nav-bar a.active {
+color: var(–accent-gold);
+border-bottom-color: var(–accent-gold);
+}
+
+/* ── Section Styling ── */
+.container {
+max-width: 860px;
+margin: 0 auto;
+padding: 0 2rem;
+}
+
+section {
+padding: 6rem 0;
+position: relative;
+}
+
+section + section { border-top: 1px solid var(–border); }
+
+.section-num {
+font-family: ‘Playfair Display’, serif;
+font-size: 5rem;
+font-weight: 900;
+color: rgba(201,169,110,0.06);
+position: absolute;
+top: 3rem;
+right: 2rem;
+line-height: 1;
+pointer-events: none;
+}
+
+.section-label {
+font-size: 0.65rem;
+letter-spacing: 0.4em;
+text-transform: uppercase;
+color: var(–accent-spice);
+margin-bottom: 1rem;
+display: block;
+}
+
+h2 {
+font-family: ‘Noto Serif JP’, serif;
+font-weight: 700;
+font-size: clamp(1.5rem, 3vw, 2.2rem);
+line-height: 1.4;
+margin-bottom: 2rem;
+}
+
+h3 {
+font-family: ‘Noto Serif JP’, serif;
+font-weight: 700;
+font-size: 1.3rem;
+line-height: 1.5;
+margin-bottom: 1.2rem;
+color: var(–accent-gold);
+}
+
+p {
+color: var(–text-muted);
+margin-bottom: 1.5rem;
+font-size: 0.92rem;
+}
+
+p strong {
+color: var(–text-main);
+font-weight: 500;
+}
+
+/* ── Intro Quote ── */
+.intro-quote {
+border-left: 2px solid var(–accent-spice);
+padding: 1.5rem 2rem;
+margin: 3rem 0;
+background: linear-gradient(135deg, rgba(212,131,47,0.04), transparent);
+border-radius: 0 8px 8px 0;
+}
+
+.intro-quote p {
+font-family: ‘Noto Serif JP’, serif;
+font-size: 1rem;
+color: var(–text-main);
+line-height: 2;
+margin: 0;
+}
+
+/* ── Shop Cards ── */
+.shop-card {
+background: var(–bg-card);
+border: 1px solid var(–border);
+border-radius: 16px;
+padding: 2.5rem;
+margin: 3rem 0;
+position: relative;
+overflow: hidden;
+transition: border-color 0.4s, transform 0.3s;
+}
+
+.shop-card:hover {
+border-color: var(–border-accent);
+transform: translateY(-2px);
+}
+
+.shop-card::before {
+content: ‘’;
+position: absolute;
+top: 0;
+left: 0;
+right: 0;
+height: 3px;
+}
+
+.shop-card.okushiba::before { background: linear-gradient(90deg, #D4832F, #C9A96E); }
+.shop-card.king::before { background: linear-gradient(90deg, #B8432F, #D4832F); }
+.shop-card.garaku::before { background: linear-gradient(90deg, #6B8C5A, #C9A96E); }
+.shop-card.suage::before { background: linear-gradient(90deg, #C9A96E, #E8E0D6); }
+
+.shop-badge {
+display: inline-flex;
+align-items: center;
+gap: 0.5rem;
+font-size: 0.65rem;
+letter-spacing: 0.2em;
+text-transform: uppercase;
+padding: 0.4rem 1rem;
+border-radius: 100px;
+margin-bottom: 1.5rem;
+}
+
+.okushiba .shop-badge { background: rgba(212,131,47,0.12); color: var(–accent-spice); }
+.king .shop-badge { background: rgba(184,67,47,0.12); color: var(–accent-red); }
+.garaku .shop-badge { background: rgba(107,140,90,0.12); color: var(–accent-green); }
+.suage .shop-badge { background: rgba(201,169,110,0.12); color: var(–accent-gold); }
+
+.shop-card h3 {
+font-size: 1.4rem;
+color: var(–text-main);
+margin-bottom: 0.5rem;
+}
+
+.shop-card .subtitle {
+font-family: ‘Playfair Display’, serif;
+font-style: italic;
+font-size: 0.85rem;
+color: var(–text-dim);
+margin-bottom: 1.5rem;
+display: block;
+}
+
+.shop-card p { font-size: 0.88rem; line-height: 2; }
+
+.keyword-list {
+display: flex;
+flex-wrap: wrap;
+gap: 0.5rem;
+margin-top: 1.5rem;
+}
+
+.keyword-list span {
+font-size: 0.7rem;
+padding: 0.3rem 0.8rem;
+border: 1px solid var(–border);
+border-radius: 100px;
+color: var(–text-dim);
+letter-spacing: 0.05em;
+}
+
+/* ── Comparison Table ── */
+.comparison-grid {
+display: grid;
+gap: 1.5rem;
+margin: 3rem 0;
+}
+
+.compare-item {
+background: var(–bg-card);
+border: 1px solid var(–border);
+border-radius: 12px;
+padding: 2rem;
+transition: border-color 0.3s;
+}
+
+.compare-item:hover { border-color: var(–border-accent); }
+
+.compare-header {
+display: flex;
+align-items: center;
+justify-content: space-between;
+margin-bottom: 1.2rem;
+flex-wrap: wrap;
+gap: 0.5rem;
+}
+
+.compare-header h4 {
+font-family: ‘Noto Serif JP’, serif;
+font-size: 1.1rem;
+font-weight: 700;
+}
+
+.compare-header .source-tag {
+font-size: 0.6rem;
+letter-spacing: 0.15em;
+text-transform: uppercase;
+padding: 0.25rem 0.7rem;
+border-radius: 100px;
+background: rgba(212,131,47,0.1);
+color: var(–accent-spice);
+}
+
+.merit-demerit {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 1rem;
+margin-top: 1rem;
+}
+
+@media (max-width: 600px) { .merit-demerit { grid-template-columns: 1fr; } }
+
+.merit, .demerit {
+padding: 1rem 1.2rem;
+border-radius: 8px;
+font-size: 0.82rem;
+line-height: 1.9;
+color: var(–text-muted);
+}
+
+.merit {
+background: rgba(107,140,90,0.08);
+border-left: 2px solid var(–accent-green);
+}
+
+.demerit {
+background: rgba(184,67,47,0.06);
+border-left: 2px solid var(–accent-red);
+}
+
+.merit-label, .demerit-label {
+font-size: 0.6rem;
+letter-spacing: 0.2em;
+text-transform: uppercase;
+display: block;
+margin-bottom: 0.5rem;
+font-weight: 500;
+}
+
+.merit-label { color: var(–accent-green); }
+.demerit-label { color: var(–accent-red); }
+
+/* ── Recommendation Cards ── */
+.rec-grid {
+display: grid;
+gap: 1.5rem;
+margin: 3rem 0;
+}
+
+.rec-card {
+background: var(–bg-card);
+border: 1px solid var(–border);
+border-radius: 16px;
+padding: 2.5rem;
+position: relative;
+overflow: hidden;
+transition: all 0.4s;
+}
+
+.rec-card:hover {
+border-color: var(–border-accent);
+background: var(–bg-card-hover);
+}
+
+.rec-num {
+font-family: ‘Playfair Display’, serif;
+font-size: 3.5rem;
+font-weight: 900;
+color: rgba(201,169,110,0.08);
+position: absolute;
+top: 1rem;
+right: 1.5rem;
+line-height: 1;
+}
+
+.rec-target {
+font-size: 0.65rem;
+letter-spacing: 0.3em;
+text-transform: uppercase;
+color: var(–accent-spice);
+margin-bottom: 0.8rem;
+display: block;
+}
+
+.rec-card h4 {
+font-family: ‘Noto Serif JP’, serif;
+font-size: 1.15rem;
+font-weight: 700;
+margin-bottom: 0.4rem;
+}
+
+.rec-shop {
+font-family: ‘Playfair Display’, serif;
+font-style: italic;
+color: var(–accent-gold);
+font-size: 0.9rem;
+margin-bottom: 1rem;
+display: block;
+}
+
+.rec-card p { font-size: 0.85rem; margin: 0; }
+
+/* ── Outlook / Future ── */
+.outlook-item {
+padding: 2rem 0;
+border-bottom: 1px solid var(–border);
+}
+
+.outlook-item:last-child { border-bottom: none; }
+
+.outlook-num {
+font-family: ‘Playfair Display’, serif;
+font-size: 0.8rem;
+color: var(–accent-gold);
+display: inline-block;
+width: 1.6rem;
+height: 1.6rem;
+line-height: 1.6rem;
+text-align: center;
+border: 1px solid var(–accent-gold);
+border-radius: 50%;
+margin-right: 0.8rem;
+vertical-align: middle;
+}
+
+.outlook-item h4 {
+font-family: ‘Noto Serif JP’, serif;
+font-size: 1.05rem;
+font-weight: 700;
+display: inline;
+vertical-align: middle;
+}
+
+.outlook-item p { margin-top: 1rem; }
+
+/* ── Conclusion ── */
+.conclusion-box {
+background: linear-gradient(135deg, rgba(212,131,47,0.06), rgba(201,169,110,0.03));
+border: 1px solid var(–border-accent);
+border-radius: 16px;
+padding: 3rem;
+margin: 2rem 0;
+}
+
+.conclusion-box p {
+font-family: ‘Noto Serif JP’, serif;
+font-size: 0.95rem;
+color: var(–text-main);
+line-height: 2.2;
+}
+
+/* ── References ── */
+.references {
+margin-top: 2rem;
+}
+
+.references li {
+list-style: none;
+padding: 0.8rem 0;
+border-bottom: 1px solid var(–border);
+font-size: 0.78rem;
+color: var(–text-dim);
+}
+
+.references li::before {
+content: attr(data-num);
+font-family: ‘Playfair Display’, serif;
+font-size: 0.7rem;
+color: var(–accent-gold);
+margin-right: 0.8rem;
+}
+
+.references a {
+color: var(–text-muted);
+text-decoration: none;
+border-bottom: 1px solid var(–border);
+transition: all 0.3s;
+}
+.references a:hover {
+color: var(–accent-gold);
+border-color: var(–accent-gold);
+}
+
+/* ── Footer ── */
+footer {
+text-align: center;
+padding: 4rem 2rem;
+border-top: 1px solid var(–border);
+color: var(–text-dim);
+font-size: 0.7rem;
+letter-spacing: 0.15em;
+}
+
+footer .logo-text {
+font-family: ‘Noto Serif JP’, serif;
+font-size: 1rem;
+color: var(–accent-gold);
+margin-bottom: 1rem;
+display: block;
+}
+
+/* ── Animations ── */
+@keyframes fadeUp {
+from { opacity: 0; transform: translateY(20px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scrollPulse {
+0%, 100% { opacity: 0.3; transform: scaleY(1); }
+50% { opacity: 1; transform: scaleY(1.3); }
+}
+
+.fade-in {
+opacity: 0;
+transform: translateY(30px);
+transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.fade-in.visible {
+opacity: 1;
+transform: translateY(0);
+}
+
+/* ── Separator ── */
+.spice-sep {
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 1rem;
+padding: 2rem 0;
+color: var(–text-dim);
+}
+
+.spice-sep::before, .spice-sep::after {
+content: ‘’;
+height: 1px;
+width: 60px;
+background: linear-gradient(90deg, transparent, var(–border), transparent);
+}
+
+.spice-sep svg { width: 16px; height: 16px; opacity: 0.3; }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+.hero { padding: 2rem 1.5rem; }
+section { padding: 4rem 0; }
+.container { padding: 0 1.5rem; }
+.shop-card, .rec-card, .conclusion-box { padding: 1.8rem; }
+.section-num { font-size: 3rem; right: 1rem; top: 2rem; }
+}
+</style>
+
+</head>
+<body>
+
+<!-- ═══ Hero ═══ -->
+
+<header class="hero">
+  <div class="hero-label">Market Structure Analysis 2026</div>
+  <h1>
+    札幌<span class="accent">スープカレー</span>市場の<br>構造的分析
+  </h1>
+  <p class="hero-sub">
+    主要4店舗の特性、提供価値および消費者推奨度の包括的評価
+  </p>
+  <div class="hero-shops">
+    <span>奥芝商店</span>
+    <span>SOUP CURRY KING</span>
+    <span>GARAKU</span>
+    <span>Suage+</span>
+  </div>
+  <div class="scroll-hint">
+    <span>SCROLL</span>
+    <div class="scroll-line"></div>
+  </div>
+</header>
+
+<!-- ═══ Sticky Nav ═══ -->
+
+<nav class="nav-bar" id="nav">
+  <div class="nav-inner">
+    <a href="#intro">序論</a>
+    <a href="#shops">店舗分析</a>
+    <a href="#comparison">メリット・デメリット</a>
+    <a href="#operation">オペレーション考察</a>
+    <a href="#recommend">推奨度</a>
+    <a href="#outlook">将来展望</a>
+    <a href="#conclusion">結論</a>
+  </div>
+</nav>
+
+<!-- ═══ Intro ═══ -->
+
+<section id="intro">
+  <div class="container">
+    <span class="section-num">01</span>
+    <span class="section-label fade-in">Introduction</span>
+    <h2 class="fade-in">地域固有のガストロノミーから<br>全国的食文化への昇華</h2>
+
+```
+<p class="fade-in">北海道札幌市を発祥とする「スープカレー」は、1970年代の薬膳カレーを起源としながら、数十年の歳月を経て極めて高度な進化を遂げた日本独自のスパイス料理体系である。単なる「液状のカレー」という表層的な理解を超え、現在では<strong>フレンチのブイヨン抽出技法、和食の出汁文化、そして東南アジアや南アジアの複雑なスパイス調合技術</strong>が一杯のどんぶりの中で交差する、極めて多層的なガストロノミーとして認識されている。</p>
+
+<p class="fade-in">この市場は長らく局所的な熱狂に支えられてきたが、近年では観光資源としての価値にとどまらず、全国的な飲食チェーンや冷凍食品、さらには電子商取引（Eコマース）を通じた独自のサプライチェーンを形成する巨大な産業へと成長している。</p>
+
+<div class="intro-quote fade-in">
+  <p>本分析の目的は、各店舗が提供するメニューの特性、価格設定、ターゲティング戦略を解剖し、それぞれの事業モデルが内包する構造的なメリットおよびデメリットを浮き彫りにすることにある。</p>
+</div>
+
+<p class="fade-in">本報告書は、この成熟しつつある札幌スープカレー市場において、確固たるブランド力と独自性を有し、業界のベンチマークとなっている主要4店舗——スープカレー奥芝商店、SOUP CURRY KING、スープカレーGARAKU、Suage+——を対象とした包括的な研究成果である。</p>
+```
+
+  </div>
+</section>
+
+<!-- ═══ Shop Analysis ═══ -->
+
+<section id="shops">
+  <div class="container">
+    <span class="section-num">02</span>
+    <span class="section-label fade-in">Deep Dive</span>
+    <h2 class="fade-in">対象店舗の特性分析と<br>提供価値の深層</h2>
+
+```
+<p class="fade-in">札幌という単一の地理的市場において、これら4店舗はそれぞれ全く異なるベクトルでスープカレーの可能性を拡張している。スパイスの調合哲学、タンパク質源の選定、トッピングによるカスタマイズの経済学、そして調理工程における技術的特化など、各ブランドが採用する戦略的差別化の要因を詳細に検討する。</p>
+
+<!-- 奥芝商店 -->
+<div class="shop-card okushiba fade-in">
+  <div class="shop-badge">● 奥芝商店</div>
+  <h3>スープカレー奥芝商店</h3>
+  <span class="subtitle">Multi-generational Spice Philosophy & Craftsmanship</span>
+
+  <p>スープカレー奥芝商店は、市場において極めて特異かつ強固なポジショニングを確立している。同ブランドを牽引する最大の要素は、<strong>15種類以上のスパイスを独自に配合した「秘伝ブレンドの奥芝スパイス」</strong>の存在である。一般的に、スパイスカレーはその刺激の強さや香りの複雑さから、特定の愛好家や若年層をメインターゲットとする「ニッチ向けの嗜好品」に偏る傾向がある。しかし、奥芝商店はこのスパイス調合に緻密な工夫を凝らし、子供や年配の客であっても抵抗なく食べやすい味覚設計を実現している。</p>
+
+  <p>この<strong>「多世代包摂型」のアプローチ</strong>は、スープカレーを単なる若者のトレンド食から、三世代が同席して楽しむことのできる「日常の延長線上にあるハレの日の食事」へと再定義する画期的な転換点となった。</p>
+
+  <p>さらに、同店の事業モデルを支える重要な柱が<strong>「一杯ずつ手作り」</strong>という厳格な調理工程の堅持である。効率と回転率が至上命題とされる現代のファストカジュアル飲食業界において、あえて労働集約的で手間の掛かるプロセスを維持することは、消費者に対して「本物志向」や「クラフト感」という強力な情緒的価値を提供している。「駅前創成寺-soseiji-」や「おくしばぁちゃん-okushibachan-」といった、画一的なチェーン店とは一線を画す独自の店舗名称とコンセプトの付与は、地域に根ざしたブティック型の空間体験を創出する意図がある。</p>
+
+  <p>また、同店は催事スケジュールの案内や、通販に関するよくある質問といった<strong>電子商取引（Eコマース）のインフラ</strong>を整備しており、実店舗の枠を超えた全国的なブランド展開を推進している。同時に、一部製品の価格改定のお知らせが出されていることは、スパイス輸入価格の高騰や物流費の上昇といったマクロ経済の波に対して、品質を維持するための適切な価格転嫁を行っている証左であり、持続可能な経営戦略の表れと評価できる。</p>
+
+  <div class="keyword-list">
+    <span>15種以上のスパイス</span>
+    <span>多世代包摂型</span>
+    <span>一杯ずつ手作り</span>
+    <span>クラフト感</span>
+    <span>Eコマース展開</span>
+  </div>
+</div>
+
+<!-- KING -->
+<div class="shop-card king fade-in">
+  <div class="shop-badge">● SOUP CURRY KING</div>
+  <h3>SOUP CURRY KING</h3>
+  <span class="subtitle">Local Gastronomy through Unique Protein Exploration</span>
+
+  <p>SOUP CURRY KINGは、スープカレーの可能性を<strong>「具材の多様性」、特にタンパク質源の革新</strong>という側面から切り拓いているブランドである。同店において最も注目すべきは、本店でしか注文することができない限定的な特別メニューの存在である。この「場所の限定性」は、消費者の来店動機を強力に喚起し、店舗への意図的なトラフィックを創出する高度なマーケティング手法として機能している。</p>
+
+  <p>本店限定メニューの筆頭として挙げられるのが<strong>「ラムカリー（1,200円）」</strong>および<strong>「ラム野菜カリー（1,450円）」</strong>である。北海道において羊肉（ラム）は、ジンギスカンに代表されるように極めて親和性が高く、歴史的・文化的な文脈を持つローカル食材である。これをスープカレーの主役として統合したことは、観光客や地元住民に対して「北海道の食文化を二重に体験できる」という圧倒的な付加価値を提供している。</p>
+
+  <p>さらに特筆すべきは<strong>「牛スジ豆腐カリー（1,250円）」</strong>の存在である。牛スジと豆腐という組み合わせは、日本の伝統的な居酒屋文化や和食の煮込み料理を想起させるものであり、既存の定番具材のパラダイムを打破する極めて前衛的な試みである。牛スジから長時間かけて溶け出すゼラチン質とアミノ酸系の旨味、そしてスパイススープをたっぷりと吸い込む豆腐のテクスチャーは、スープカレーの新たな消費体験を提示している。</p>
+
+  <div class="keyword-list">
+    <span>本店限定メニュー</span>
+    <span>ラム肉</span>
+    <span>牛スジ豆腐</span>
+    <span>ローカル食材</span>
+    <span>場所の限定性</span>
+  </div>
+</div>
+
+<!-- GARAKU -->
+<div class="shop-card garaku fade-in">
+  <div class="shop-badge">● GARAKU</div>
+  <h3>スープカレーGARAKU</h3>
+  <span class="subtitle">Customization Economy & Texture Engineering</span>
+
+  <p>スープカレーGARAKUは、和風出汁とオリジナルスパイスの融合による深い旨味で知られているが、メニュー構造から読み取れる同店の真の競争優位性は、高度に計算された<strong>「カスタマイズ経済圏」</strong>の構築にある。同店は、消費者が自身の好みに合わせて一杯のカレーを微細に構築できるシステムを採用しており、これが高い顧客単価と深い顧客ロイヤルティを生み出している。</p>
+
+  <p>まず、ベースとなるライスの量について、同店は<strong>「お茶碗1杯が150g」</strong>という極めて明確な基準（アンカリング）を提示している。その上で、スープの辛さ（Hotスープ）に対して、段階的な追加料金（110円、あるいは220円）を設定している。多くのカレー店において辛さの調整は無料サービスとして提供されることが多いが、GARAKUはより強い刺激を求めるコアな愛好家層に対して、使用するスパイスの原価に見合った適正な課金を行う<strong>「マイクロトランザクション（微少額決済）モデル」</strong>を確立している。</p>
+
+  <p>さらに、特筆すべきは<strong>「もっと！きくらげ」</strong>というトッピングの存在である。きくらげ特有のコリコリとした硬質な食感（テクスチャー）は、液体のスープと柔らかく煮込まれた野菜の中で明確なコントラストを生み出し、食事の単調さを防ぐ重要な役割を果たす。消費者の嗜好が「単なる味覚」から「口腔内での物理的な体験（食感）」へと移行している現代のガストロノミートレンドを、GARAKUはトッピングという形で的確に捉えている。</p>
+
+  <div class="keyword-list">
+    <span>カスタマイズ経済圏</span>
+    <span>マイクロトランザクション</span>
+    <span>テクスチャー</span>
+    <span>辛さ段階課金</span>
+    <span>和風出汁×スパイス</span>
+  </div>
+</div>
+
+<!-- Suage+ -->
+<div class="shop-card suage fade-in">
+  <div class="shop-badge">● Suage+</div>
+  <h3>Suage+</h3>
+  <span class="subtitle">Technical Specialization & Information Architecture</span>
+
+  <p>Suage（すあげ）およびその発展ブランドであるSuage+は、その名の通り、具材となる野菜や肉類を<strong>「素揚げ（衣をつけずに高温の油で揚げる調理法）」</strong>にすることに特化した店舗である。素揚げという工程は、食材表面の水分を瞬時に蒸発させて壁を作り、内部に食材本来の甘みや水分を閉じ込める効果がある。同時に、油のコクが付加されることで、スパイシーなスープと絡んだ際の風味の相乗効果が極大化される。</p>
+
+  <p>同ブランドのもう一つの際立った特徴は、消費者に対する<strong>「情報アーキテクチャの最適化」</strong>である。「食べるべきおすすめ人気カレー3選」や「魅力やこだわりを徹底詳しく紹介」、さらには「覚えておくと役立つこと」といった、初心者向けのガイドラインが豊富に存在している。スープカレーは注文時に消費者が下すべき意思決定（パラメーター）が非常に多く、初心者や観光客にとって「選択のパラドックス」を引き起こす。Suage+は、推奨される組み合わせをあらかじめ提示し、情報の非対称性を解消することで、極めてユーザーフレンドリーな接客体系を構築している。</p>
+
+  <div class="keyword-list">
+    <span>素揚げ特化</span>
+    <span>情報アーキテクチャ</span>
+    <span>おすすめ3選</span>
+    <span>初心者フレンドリー</span>
+    <span>多店舗展開</span>
+  </div>
+</div>
+```
+
+  </div>
+</section>
+
+<!-- ═══ Comparison ═══ -->
+
+<section id="comparison">
+  <div class="container">
+    <span class="section-num">03</span>
+    <span class="section-label fade-in">Strengths & Weaknesses</span>
+    <h2 class="fade-in">メリットとデメリットの<br>構造的比較</h2>
+
+```
+<p class="fade-in">ある側面で強力なメリット（強み）となる要素は、トレードオフとして別の側面でデメリット（制約や弱点）を生み出す構造となっている。以下に、各店舗が抱える二面性を比較分析する。</p>
+
+<div class="comparison-grid">
+  <div class="compare-item fade-in">
+    <div class="compare-header">
+      <h4>スープカレー奥芝商店</h4>
+      <span class="source-tag">ブランドの神聖性 × 世代を超えたLTV</span>
+    </div>
+    <div class="merit-demerit">
+      <div class="merit">
+        <span class="merit-label">Merit — 構造的強み</span>
+        15種類以上の独自スパイスによる深いコクと、子供から高齢者まで楽しめる多世代包摂型の味覚設計。「一杯ずつ手作り」に裏打ちされた高い品質とクラフト感の創出。
+      </div>
+      <div class="demerit">
+        <span class="demerit-label">Demerit — 構造的制約</span>
+        手作り工程に依存するため、単位時間あたりの提供数（スループット）に限界があり、ピーク時の長時間の待機列発生や回転率の低下というオペレーション上のリスクを常に内包する。
+      </div>
+    </div>
+  </div>
+
+  <div class="compare-item fade-in">
+    <div class="compare-header">
+      <h4>SOUP CURRY KING</h4>
+      <span class="source-tag">地域文化融合 × リピーターの熱狂</span>
+    </div>
+    <div class="merit-demerit">
+      <div class="merit">
+        <span class="merit-label">Merit — 構造的強み</span>
+        ラム肉や牛スジ豆腐など、他店とは一線を画す独自性の高いタンパク質源の提供。本店限定メニューによる強烈な来店動機の創出と、北海道の地域性を反映した高い付加価値。
+      </div>
+      <div class="demerit">
+        <span class="demerit-label">Demerit — 構造的制約</span>
+        羊肉の独特の風味や、和風の牛スジ豆腐といった尖ったメニュー構成は、王道のチキンカレーを求める保守的な消費者層にとっては選択肢からの除外要因となり得る。
+      </div>
+    </div>
+  </div>
+
+  <div class="compare-item fade-in">
+    <div class="compare-header">
+      <h4>スープカレーGARAKU</h4>
+      <span class="source-tag">客単価ARPU最大化 × 食感のエンタメ化</span>
+    </div>
+    <div class="merit-demerit">
+      <div class="merit">
+        <span class="merit-label">Merit — 構造的強み</span>
+        辛さの段階的課金（110円・220円）による収益性の向上と、炙りチーズ、じゃがいも、きくらげといった多彩なトッピングによる高度な自己表現（カスタマイズ）の実現。
+      </div>
+      <div class="demerit">
+        <span class="demerit-label">Demerit — 構造的制約</span>
+        トッピングや辛さの追加を重ねることで最終的な支払い金額が高騰しやすく、価格への敏感な層の離反を招く恐れ。また、選択肢の多さが意思決定の疲労を引き起こす可能性。
+      </div>
+    </div>
+  </div>
+
+  <div class="compare-item fade-in">
+    <div class="compare-header">
+      <h4>Suage+</h4>
+      <span class="source-tag">オペレーション標準化 × 大衆リーチ力</span>
+    </div>
+    <div class="merit-demerit">
+      <div class="merit">
+        <span class="merit-label">Merit — 構造的強み</span>
+        食材の旨味を凝縮する「素揚げ」技術への特化による安定した美味しさ。おすすめ3選の提示など、注文の複雑さを排除した高い情報利便性と、初心者・観光客に対する圧倒的な安心感の提供。
+      </div>
+      <div class="demerit">
+        <span class="demerit-label">Demerit — 構造的制約</span>
+        大衆性と利便性を追求し、万人に受け入れられる味を目指す設計は、極度に刺激的なスパイス感やマニアックな食材の組み合わせを求めるコアな層にとっては、やや無難で驚きに欠ける体験となるリスク。
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+  </div>
+</section>
+
+<!-- ═══ Operation ═══ -->
+
+<section id="operation">
+  <div class="container">
+    <span class="section-num">04</span>
+    <span class="section-label fade-in">Operational Insight</span>
+    <h2 class="fade-in">オペレーションモデルと<br>消費者心理の交差点</h2>
+
+```
+<p class="fade-in">この比較から浮かび上がるのは、各店舗が<strong>「品質と効率のジレンマ」</strong>に対して異なる回答を用意しているという事実である。</p>
+
+<p class="fade-in">奥芝商店の「一杯ずつ手作り」は効率を意図的に犠牲にして品質とブランド価値を最大化する戦略であり、これは「おくしばぁちゃん」のような空間デザインによって、待ち時間すらも<strong>「特別な料理を待つための儀式」</strong>へと昇華させている。</p>
+
+<p class="fade-in">対照的にGARAKUは、ライス150gという標準フォーマットをベースに、トッピングという付加作業（オペレーション負荷の低い作業）を顧客に選択させることで、厨房の混乱を防ぎながら顧客単価を吊り上げるスマートな経済モデルを構築している。</p>
+
+<p class="fade-in">KINGの限定メニュー戦略は、食材の仕入れと調理プロセスを特定の店舗に集中させることで、<strong>希少価値を生み出しつつ廃棄リスクをコントロール</strong>する手法と見ることができる。そしてSuage+の「おすすめ3選」は、顧客の注文を特定の人気メニューに誘導することで、食材の回転率を高め、予測可能なオペレーションを実現するための極めて合理的なアプローチであると言える。</p>
+```
+
+  </div>
+</section>
+
+<!-- ═══ Recommendation ═══ -->
+
+<section id="recommend">
+  <div class="container">
+    <span class="section-num">05</span>
+    <span class="section-label fade-in">Recommendation</span>
+    <h2 class="fade-in">消費者セグメント別の<br>推奨度と文脈的適合性</h2>
+
+```
+<p class="fade-in">スープカレーの評価は絶対的な基準が存在するわけではなく、消費者のその日の目的、同伴者、求める体験価値との適合性によって相対的に決定される。</p>
+
+<div class="rec-grid">
+  <div class="rec-card fade-in">
+    <span class="rec-num">01</span>
+    <span class="rec-target">For Family & Slow Food Lovers</span>
+    <h4>家族連れ、温かな世界観とスローフードを愛する消費者</h4>
+    <span class="rec-shop">→ スープカレー奥芝商店</span>
+    <p>三世代での家族旅行や、幼い子供を伴う週末の食事において、奥芝商店は市場における絶対的な最適解となる。15種類以上のスパイスを使用しながらも、子供や高齢者の味覚に寄り添うように調合されたそのスープは、家族間の嗜好の違いという問題をエレガントに解決する。「おくしばぁちゃん」に代表されるコンセプチュアルな空間と、一杯ずつ丁寧に手作りされるプロセスは、単なる栄養補給ではなく「団欒という時間」を提供する。</p>
+  </div>
+
+  <div class="rec-card fade-in">
+    <span class="rec-num">02</span>
+    <span class="rec-target">For Food Explorers & Deep Culture Travelers</span>
+    <h4>食の探求者、地域のディープな食文化を追求する旅行者</h4>
+    <span class="rec-shop">→ SOUP CURRY KING</span>
+    <p>既存のスープカレーの枠組みに飽きたリピーターや、北海道という土地の風土を皿の上で感じたいと願う熱心なガストロノミー愛好家には、SOUP CURRY KINGを強く推奨する。限定提供されるラムカリー（1,200円）やラム野菜カリー（1,450円）は、北海道特有の羊肉食文化の新たな一面を開眼させる傑作であり、牛スジ豆腐カリー（1,250円）は居酒屋文化とスパイスの融合という前衛的な体験を約束する。</p>
+  </div>
+
+  <div class="rec-card fade-in">
+    <span class="rec-num">03</span>
+    <span class="rec-target">For Customization Enthusiasts & Spice Seekers</span>
+    <h4>刺激の微調整と、テクスチャーのエンターテインメントを求める層</h4>
+    <span class="rec-shop">→ スープカレーGARAKU</span>
+    <p>自身の欲望を正確にどんぶりに反映させたいカスタマイズ志向の強い消費者や、強いスパイスの刺激（Hotスープ）を求める層にとって、GARAKUのシステムは極めて魅力的である。炙りチーズによる乳脂肪分の追加や、「もっと！きくらげ」による圧倒的な咀嚼感の追加など、まるでパレットの上で絵の具を調合するように自分だけの一杯を創り上げるプロセスは、それ自体が高度なエンターテインメントとして機能する。</p>
+  </div>
+
+  <div class="rec-card fade-in">
+    <span class="rec-num">04</span>
+    <span class="rec-target">For Business Travelers & Beginners</span>
+    <h4>確実性と利便性を重んじる出張者、およびスープカレー初心者</h4>
+    <span class="rec-shop">→ Suage+</span>
+    <p>滞在時間が限られているビジネスパーソンや、「絶対に失敗したくない」と考えるスープカレーの初心者には、Suage+が最も安全かつ高品質な選択肢として推奨される。「おすすめ人気カレー3選」といった明快なガイドラインが用意されているため、複雑なメニューを前にして戸惑うストレスが一切ない。素揚げという確立された技法によって、王道にしてスタンダードな美味しさを、極めて洗練されたサービス体験とともに享受することができる。</p>
+  </div>
+</div>
+```
+
+  </div>
+</section>
+
+<!-- ═══ Future Outlook ═══ -->
+
+<section id="outlook">
+  <div class="container">
+    <span class="section-num">06</span>
+    <span class="section-label fade-in">Future Outlook</span>
+    <h2 class="fade-in">市場全体の将来展望</h2>
+
+```
+<p class="fade-in">本調査で対象とした4店舗の戦略を俯瞰すると、スープカレーという地域料理が、より広範な外食産業に対してどのような影響を与え、今後どのように進化していくのかという波及効果が見えてくる。</p>
+
+<div class="outlook-item fade-in">
+  <span class="outlook-num">1</span>
+  <h4>サプライチェーンと価格転嫁の透明化</h4>
+  <p>奥芝商店が「一部製品価格改定のお知らせ」を明示しているように、数十種類のスパイスを海外から輸入し、地元の新鮮な野菜や肉類を大量に使用するスープカレー業界は、国際的な物流コストの変動や気候変動による農作物の価格高騰の直接的な影響を受ける。しかし、各店舗は「一杯ずつ手作り」や「独自スパイスの配合」、「素揚げ技術」といった付加価値を明確に提示することで、消費者に対して<strong>「品質維持のための適正なコスト」</strong>としての理解を求めており、これが市場の価格受容度を引き上げる要因となっている。</p>
+</div>
+
+<div class="outlook-item fade-in">
+  <span class="outlook-num">2</span>
+  <h4>カスタマイズ文化の浸透と高付加価値化</h4>
+  <p>GARAKUが実践する150gのライス基準や、辛さに対する追加課金、そしてきくらげや炙りチーズといった細分化されたトッピングの提供は、消費者が<strong>「自分向けにパーソナライズされた体験」に対しては出費を惜しまない</strong>という現代の消費行動を見事に捉えている。このマイクロトランザクションの概念は、今後他の飲食ジャンルにおいても客単価を引き上げるための標準的なモデルとして模倣・踏襲されていく可能性が高い。</p>
+</div>
+
+<div class="outlook-item fade-in">
+  <span class="outlook-num">3</span>
+  <h4>食材の再定義と地域内エコシステムの構築</h4>
+  <p>KINGが提供するラムカリーや牛スジ豆腐カリーは、これまでチキンやポークに依存しがちであったスープカレーのタンパク質源に新たな選択肢を提示した。特にラム肉の活用は、北海道内の食肉流通業者との新たなサプライチェーンを構築し、<strong>地域の第一次産業と飲食業が連携</strong>して「新たな郷土料理の形」を創出する好例である。今後、ジビエ（エゾシカなど）や地場の海産物を活用した新たなスープカレーが誕生する土壌が育まれている。</p>
+</div>
+
+<div class="outlook-item fade-in">
+  <span class="outlook-num">4</span>
+  <h4>物理的制約を超えるブランドの拡張</h4>
+  <p>奥芝商店が催事スケジュールを案内し、通販に関するよくある質問ページを設けている事実は、スープカレーがもはや「札幌に行かなければ食べられない料理」から、<strong>「全国どこでも、自宅でも体験できるブランド」</strong>へと進化したことを意味している。急速な冷凍技術の向上やEコマースのインフラ整備により、実店舗での「一杯ずつ手作り」の熱量をいかにしてデジタル空間やパッケージ商品に翻訳し、全国の消費者に届けるかが、今後のトップブランドの生き残りを賭けた主戦場となる。</p>
+</div>
+```
+
+  </div>
+</section>
+
+<!-- ═══ Conclusion ═══ -->
+
+<section id="conclusion">
+  <div class="container">
+    <span class="section-num">07</span>
+    <span class="section-label fade-in">Conclusion</span>
+    <h2 class="fade-in">結論</h2>
+
+```
+<div class="conclusion-box fade-in">
+  <p>本分析を通じて明らかになったのは、札幌のスープカレー市場を牽引する奥芝商店、SOUP CURRY KING、GARAKU、Suage+の4店舗が、決して同じパイを奪い合う均質な競合ではなく、それぞれが極めて高度に言語化された独自の戦略に基づき、異なる消費者欲求を満たすエコシステムを形成しているという事実である。</p>
+</div>
+
+<p class="fade-in">奥芝商店の15種のスパイスと手作りへの回帰、KINGのラム肉や牛スジを用いたローカル食材の探求、GARAKUのきくらげや炙りチーズを通じた食感とカスタマイズのマネジメント、そしてSuage+の初心者へ向けた情報アーキテクチャの最適化——これらはすべて、多様化する現代の消費者心理に対する飲食業界からの精緻な回答である。</p>
+
+<p class="fade-in">消費者は今や、単なる空腹を満たすためではなく、<strong>「誰と、どのような空間で、どれほどの自由度をもって、いかなる食文化の背景を咀嚼したいか」</strong>という高度な文脈の選択としてスープカレー店を選んでいる。本報告書で提示した消費者セグメント別の推奨度とその根拠は、この複雑な市場を航海するための明確な海図となるものである。</p>
+
+<p class="fade-in">各ブランドの経営努力と革新性は、地方発の料理がいかにして全国規模のガストロノミーへと昇華し得るかを示す、極めて重要なケーススタディとして永く評価されるべきである。</p>
+
+<div class="spice-sep">
+  <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="3"/></svg>
+</div>
+
+<div class="references fade-in">
+  <h3 style="font-size: 0.8rem; letter-spacing: 0.2em; color: var(--text-dim); margin-bottom: 1rem;">引用文献</h3>
+  <ul>
+    <li data-num="[1]">こだわり | スープカレー奥芝商店公式ホームページ — <a href="https://okushiba.net/commit/" target="_blank">okushiba.net/commit/</a></li>
+    <li data-num="[2]">濃厚Wスープがやみつきに！SOUP CURRY KING おすすめメニュー3選 — <a href="https://johnny88.jp/soupcurry-king/" target="_blank">johnny88.jp/soupcurry-king/</a></li>
+    <li data-num="[3]">Menu - スープカレーGARAKU（ガラク） — <a href="https://s-garaku.com/menu/" target="_blank">s-garaku.com/menu/</a></li>
+  </ul>
+</div>
+```
+
+  </div>
+</section>
+
+<footer>
+  <span class="logo-text">札幌スープカレー市場分析</span>
+  Comprehensive Market Structure Analysis — 2026
+</footer>
+
+<script>
+// Scroll-based fade-in
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+// Sticky nav visibility
+const nav = document.getElementById('nav');
+const hero = document.querySelector('.hero');
+
+const navObserver = new IntersectionObserver(([entry]) => {
+  nav.classList.toggle('visible', !entry.isIntersecting);
+}, { threshold: 0 });
+
+navObserver.observe(hero);
+
+// Active nav link
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-bar a');
+
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(sec => {
+    if (window.scrollY >= sec.offsetTop - 120) {
+      current = sec.getAttribute('id');
+    }
+  });
+  navLinks.forEach(link => {
+    link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+  });
+});
+</script>
+
+</body>
+</html>
